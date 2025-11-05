@@ -4,11 +4,18 @@ export default class MundoAberto extends Phaser.Scene {
         this.player = null;
         this.cursors = null;
         this.dpad = null;
+        this.fadedTiles = []; 
 
         this.chaoLayer = null;
         this.carrosLayer = null;
         this.casasLayer = null;
         this.diversosLayer = null;
+        this.rioLayer = null;
+    }
+
+    init(data) {
+        this.startX = data.returnX || 1150; 
+        this.startY = data.returnY || 300;
     }
 
     create() {
@@ -19,8 +26,13 @@ export default class MundoAberto extends Phaser.Scene {
         this.chaoLayer = map.createLayer('ground', tileset, 0, 0);
         this.chaoLayer.setDepth(0);
 
-        this.player = this.physics.add.sprite(1150, 300, 'amora');
-        this.player.setDepth(0); 
+        this.rioLayer = map.createLayer('river', tileset, 0, 0);
+        this.rioLayer.setDepth(0);
+
+        this.player = this.physics.add.sprite(this.startX, this.startY, 'amora');
+        this.player.setDepth(0);
+        this.player.body.debugShowBody = false;
+        this.player.body.debugShowVelocity = false;
 
         this.player.body.setSize(24, 16);
         this.player.body.setOffset(4, 16); 
@@ -38,10 +50,39 @@ export default class MundoAberto extends Phaser.Scene {
         this.casasLayer.setCollisionByProperty({ collides: true });
         this.carrosLayer.setCollisionByProperty({ collides: true });
         this.diversosLayer.setCollisionByProperty({ collides: true });
+        this.rioLayer.setCollisionByProperty({ collides: true });
  
         this.physics.add.collider(this.player, this.casasLayer);
         this.physics.add.collider(this.player, this.carrosLayer);
         this.physics.add.collider(this.player, this.diversosLayer);
+        this.physics.add.collider(this.player, this.rioLayer);
+
+        
+        const quizTrigger = map.findObject('triggers', obj => obj.name === 'gatilho_quiz');
+        
+        if (quizTrigger) {
+
+            
+            const zone = this.add.zone(quizTrigger.x + (quizTrigger.width / 2), quizTrigger.y + (quizTrigger.height / 2), quizTrigger.width, quizTrigger.height);
+            this.physics.world.enable(zone);
+            zone.body.setAllowGravity(false);
+            zone.body.setImmovable(true);
+        
+            this.add.rectangle(zone.x, zone.y, zone.width, zone.height, 0xff0000, 0.3)
+                .setOrigin(0.5, 0.5)
+                .setDepth(99);
+        
+            this.physics.add.overlap(this.player, zone, () => {
+                this.scene.stop('MundoAberto'); 
+                this.scene.start('QuizScene', 
+                {
+                    returnX: this.player.x, 
+                    returnY: this.player.y + 20
+                }); // Inicia a cena do Quiz passando a posição do jogador
+            }, null, this);
+
+        }
+
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.startFollow(this.player);

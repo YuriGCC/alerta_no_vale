@@ -6,11 +6,11 @@ export default class PreCarregadorCenas extends Phaser.Scene {
     preload() {
         this.add.text(20, 20, 'Carregando...');
 
-        this.load.image('mapa', 'assets/tiles.png');
+        this.load.image('mapa', 'assets/map/tiles.png');
         
-        this.load.tilemapTiledJSON('mapaJSON', 'assets/mapa.json');
+        this.load.tilemapTiledJSON('mapaJSON', 'assets/map/mapa.json');
 
-        this.load.spritesheet('amora', 'assets/dog.png', { 
+        this.load.spritesheet('amora', 'assets/characters/dog.png', { 
             frameWidth: 64, 
             frameHeight: 61 
         });

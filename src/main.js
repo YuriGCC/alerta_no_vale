@@ -1,5 +1,6 @@
 import PreCarregadorCenas from './scenes/PreCarregadorCenas.js';
 import MundoAberto from './scenes/MundoAberto.js';
+import Quiz from './scenes/Quiz.js'
 
 
 const config = {
@@ -10,13 +11,13 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
         }
     },
     render: {
         pixelArt: true
     },
-    scene: [ PreCarregadorCenas, MundoAberto ]
+    scene: [ PreCarregadorCenas, MundoAberto, Quiz ]
 }
 
 new Phaser.Game(config);
