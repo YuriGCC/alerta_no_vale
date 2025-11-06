@@ -12,7 +12,7 @@ export default class MundoAberto extends Phaser.Scene {
         this.diversosLayer = null;
         this.rioLayer = null;
 
-        this.progression = null;
+        this.progressao = null;
     }
 
     init(data) {
@@ -22,7 +22,7 @@ export default class MundoAberto extends Phaser.Scene {
 
     create() {
         // Checa da cena de progressão 
-        this.progression = this.scene.get('Progressao');
+        this.progressao = this.scene.get('Progressao');
 
         const map = this.make.tilemap({ key: 'mapaJSON' });
         
@@ -62,27 +62,29 @@ export default class MundoAberto extends Phaser.Scene {
         this.physics.add.collider(this.player, this.diversosLayer);
         this.physics.add.collider(this.player, this.rioLayer);
 
-        
+        // Área de quiz
         const quizTrigger = map.findObject('triggers', obj => obj.name === 'gatilho_quiz');
         
         if (quizTrigger) {
-
-            
-            const zone = this.add.zone(quizTrigger.x + (quizTrigger.width / 2), quizTrigger.y + (quizTrigger.height / 2), quizTrigger.width, quizTrigger.height);
-            this.physics.world.enable(zone);
-            zone.body.setAllowGravity(false);
-            zone.body.setImmovable(true);
+            const quizZone = this.add.zone(
+                quizTrigger.x + (quizTrigger.width / 2), 
+                quizTrigger.y + (quizTrigger.height / 2), 
+                quizTrigger.width, quizTrigger.height
+                );
+            this.physics.world.enable(quizZone);
+            quizZone.body.setAllowGravity(false);
+            quizZone.body.setImmovable(true);
         
-            this.add.rectangle(zone.x, zone.y, zone.width, zone.height, 0xff0000, 0.3)
+            this.add.rectangle(quizZone.x, quizZone.y, quizZone.width, quizZone.height, 0xff0000, 0.3)
                 .setOrigin(0.5, 0.5)
                 .setDepth(99);
         
-                this.physics.add.overlap(this.player, zone, () => {
-                    if (!this.progression.missaoFoiConcluida('gatilho_quiz')) {
-                        zone.body.setEnable(false); 
+                this.physics.add.overlap(this.player, quizZone, () => {
+                    if (!this.progressao.missaoFoiConcluida('gatilho_quiz')) {
+                        quizZone.body.setEnable(false); 
     
                         this.scene.stop('MundoAberto');
-                        this.scene.start('QuizScene', { 
+                        this.scene.start('Quiz', { 
                             returnX: this.player.x, 
                             returnY: this.player.y + 20
                         });
@@ -91,10 +93,158 @@ export default class MundoAberto extends Phaser.Scene {
                 }, null, this);
 
         }
+        
 
+        // Área de progressão
+        const progressaoTrigger = map.findObject('triggers', obj => obj.name == 'gatilho_area_progressao')
+        
+        if (progressaoTrigger) {
+            const progressaoZone = this.add.zone(
+                progressaoTrigger.x + (progressaoTrigger.width / 2), 
+                progressaoTrigger.y + (progressaoTrigger.height / 2), 
+                progressaoTrigger.width, progressaoTrigger.height
+                );
+            this.physics.world.enable(progressaoZone);
+            progressaoZone.body.setAllowGravity(false);
+            progressaoZone.body.setImmovable(true);
+
+            this.physics.add.overlap(this.player, progressaoTrigger, () => {
+            }, null, this);
+        }
+
+        // Área pé de vento
+        const peDeVentoTrigger = map.findObject('triggers', obj => obj.name == 'gatilho_pe_de_vento')
+        if (peDeVentoTrigger) {
+            const peDeVentoZone = this.add.zone(
+                peDeVentoTrigger.x + (peDeVentoTrigger.width / 2), 
+                peDeVentoTrigger.y + (peDeVentoTrigger.height / 2), 
+                peDeVentoTrigger.width, peDeVentoTrigger.height
+                );
+            this.physics.world.enable(peDeVentoZone);
+            peDeVentoZone.body.setAllowGravity(false);
+            peDeVentoZone.body.setImmovable(true);
+
+            this.physics.add.overlap(this.player, peDeVentoTrigger, () => {
+            }, null, this);
+        }
+
+        // Área risco de enchente
+        const riscoEnchenteTrigger = map.findObject('triggers', obj => obj.name == 'gatilho_risco_enchente')
+        if (riscoEnchenteTrigger) {
+            const enchenteZone = this.add.zone(
+                riscoEnchenteTrigger.x + (riscoEnchenteTrigger.width / 2), 
+                riscoEnchenteTrigger.y + (riscoEnchenteTrigger.height / 2), 
+                riscoEnchenteTrigger.width, riscoEnchenteTrigger.height
+                );
+            this.physics.world.enable(enchenteZone);
+            enchenteZone.body.setAllowGravity(false);
+            enchenteZone.body.setImmovable(true);
+
+            this.physics.add.overlap(this.player, riscoEnchenteTrigger, () => {
+            }, null, this);
+        }
+
+        // Área arrasta e solta
+        const arrastaSoltaTrigger = map.findObject('triggers', obj => obj.name == 'gatilho_arrasta_solta_quiz')
+        if (arrastaSoltaTrigger) {
+            const arrastaSoltaZone = this.add.zone(
+                arrastaSoltaTrigger.x + (arrastaSoltaTrigger.width / 2), 
+                arrastaSoltaTrigger.y + (arrastaSoltaTrigger.height / 2), 
+                arrastaSoltaTrigger.width, arrastaSoltaTrigger.height
+                );
+            this.physics.world.enable(arrastaSoltaZone);
+            arrastaSoltaZone.body.setAllowGravity(false);
+            arrastaSoltaZone.body.setImmovable(true);
+
+            this.physics.add.overlap(this.player, arrastaSoltaTrigger, () => {
+            }, null, this);
+        }
+
+        // Área sete erros
+        const seteErrosTrigger = map.findObject('triggers', obj => obj.name == 'gatilho_sete_erros')
+        if (seteErrosTrigger) {
+            const seteErrosZone = this.add.zone(
+                seteErrosTrigger.x + (seteErrosTrigger.width / 2), 
+                seteErrosTrigger.y + (seteErrosTrigger.height / 2), 
+                seteErrosTrigger.width, seteErrosTrigger.height
+                );
+            this.physics.world.enable(seteErrosZone);
+            seteErrosZone.body.setAllowGravity(false);
+            seteErrosZone.body.setImmovable(true);
+
+            this.physics.add.overlap(this.player, seteErrosTrigger, () => {
+            }, null, this);
+        }
+
+        // Área risco deslizamento
+        const riscoDeslizamento = map.findObject('triggers', obj => obj.name == 'gatilho_risco_deslizamento')
+        if (riscoDeslizamento) {
+            const riscoDeslizamentoZone = this.add.zone(
+                riscoDeslizamento.x + (riscoDeslizamento.width / 2), 
+                riscoDeslizamento.y + (riscoDeslizamento.height / 2), 
+                riscoDeslizamento.width, riscoDeslizamento.height
+                );
+            this.physics.world.enable(riscoDeslizamentoZone);
+            riscoDeslizamentoZone.body.setAllowGravity(false);
+            riscoDeslizamentoZone.body.setImmovable(true);
+
+            this.physics.add.overlap(this.player, riscoDeslizamentoZone, () => {
+            }, null, this);
+        }
+
+        // Áreas de separação de lixo
+        var separarLixoAreas = []
+
+        for (var i = 0; i <= 4; i++) {
+            separarLixoAreas.push(
+                map.findObject('triggers', obj => obj.name == `gatilho_separar_lixo_${i + 1}`)
+            );
+        }
+
+        for (const separarLixoZone of separarLixoAreas) {
+            if (separarLixoZone) {
+                
+                // Verifica se a zona foi rotacionada para a vertical e faz a rotacao
+                let isRotated = false;
+                if (separarLixoZone.properties) {
+                     for (let prop of separarLixoZone.properties) {
+                        if (prop.name === 'isRotated' && prop.value === true) {
+                            isRotated = true;
+                            break;
+                        }
+                     }
+                }
+        
+                let zoneX, zoneY, zoneWidth, zoneHeight;
+        
+                if (isRotated) {
+                    zoneWidth = separarLixoZone.height; 
+                    zoneHeight = separarLixoZone.width;
+                    
+                    zoneX = separarLixoZone.x + (zoneWidth / 2);
+                    zoneY = separarLixoZone.y - (zoneHeight / 2);
+        
+                } else {
+                    zoneWidth = separarLixoZone.width;
+                    zoneHeight = separarLixoZone.height;
+                    zoneX = separarLixoZone.x + (zoneWidth / 2);
+                    zoneY = separarLixoZone.y + (zoneHeight / 2);
+                }
+        
+                const lixoZone = this.add.zone(zoneX, zoneY, zoneWidth, zoneHeight);
+        
+                this.physics.world.enable(lixoZone);
+                lixoZone.body.setAllowGravity(false);
+                lixoZone.body.setImmovable(true);
+                
+                this.physics.add.overlap(this.player, lixoZone, () => {
+                }, null, this);
+            }
+        }
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.startFollow(this.player);
+        this.cameras.main.setRoundPixels(true);
 
         this.anims.create({
             key: 'andando',
@@ -114,6 +264,15 @@ export default class MundoAberto extends Phaser.Scene {
         
         this.player.setCollideWorldBounds(true);
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+        if (this.scene.isActive('Interface')) {
+
+            this.scene.setVisible(true, 'Interface');
+            this.scene.bringToTop('Interface');
+        
+        } else {
+            this.scene.launch('Interface');
+        }
 
         this.createDpad();
     }

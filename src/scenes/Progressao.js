@@ -8,14 +8,27 @@ export default class Progressao extends Phaser.Scene {
         super('Progressao');
 
         this.missoesCompletas = {};
+        this.medalhas = 0;
     }
 
     missaoCompleta(idMissao) {
-        this.missoesCompletas[idMissao] = true;
+        if (!this.missaoFoiConcluida(idMissao)) {
+            this.missoesCompletas[idMissao] = true;
+            this.adicionarMedalha(); 
+        }
     }
 
     missaoFoiConcluida(idMissao) {
         // Retorna true se a missão existir no objeto, ou false se não existir
         return this.missoesCompletas[idMissao] || false;
+    }
+
+    adicionarMedalha() {
+        this.medalhas += 1;
+        this.events.emit('NovaMedalhaObtida', this.medalhas)
+    }
+
+    obterMedalhas() {
+        return this.medalhas;
     }
 }

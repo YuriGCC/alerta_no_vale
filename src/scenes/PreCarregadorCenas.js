@@ -7,7 +7,8 @@ export default class PreCarregadorCenas extends Phaser.Scene {
         this.add.text(20, 20, 'Carregando...');
 
         this.load.image('mapa', 'assets/map/tiles.png');
-        
+        this.load.image('medalha', 'assets/medalha.png')
+
         this.load.tilemapTiledJSON('mapaJSON', 'assets/map/mapa.json');
 
         this.load.spritesheet('amora', 'assets/characters/dog.png', { 

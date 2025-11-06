@@ -1,6 +1,6 @@
 export default class Quiz extends Phaser.Scene {
     constructor() {
-        super('QuizScene');
+        super('Quiz');
         this.returnPos = {}; // posição do jogador
     }
 
@@ -10,6 +10,7 @@ export default class Quiz extends Phaser.Scene {
     }
 
     create() {
+        this.scene.get('Interface').ehVisivel(false);
         // Checa da cena de progressão 
         this.progression = this.scene.get('Progressao');
 
@@ -50,7 +51,7 @@ export default class Quiz extends Phaser.Scene {
         }).setOrigin(0.5).setVisible(false).setInteractive();
 
         continuarButton.on('pointerdown', () => {
-            this.scene.stop('QuizScene');
+            this.scene.stop('Quiz');
             this.scene.start('MundoAberto', this.returnPos); // retorna ao mundo ao lado do quiz
         });
 
