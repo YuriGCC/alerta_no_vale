@@ -11,6 +11,8 @@ export default class MundoAberto extends Phaser.Scene {
         this.casasLayer = null;
         this.diversosLayer = null;
         this.rioLayer = null;
+
+        this.progression = null;
     }
 
     init(data) {
@@ -19,6 +21,9 @@ export default class MundoAberto extends Phaser.Scene {
     }
 
     create() {
+        // Checa da cena de progressão 
+        this.progression = this.scene.get('Progressao');
+
         const map = this.make.tilemap({ key: 'mapaJSON' });
         
         const tileset = map.addTilesetImage('tiles', 'mapa'); 
@@ -72,14 +77,18 @@ export default class MundoAberto extends Phaser.Scene {
                 .setOrigin(0.5, 0.5)
                 .setDepth(99);
         
-            this.physics.add.overlap(this.player, zone, () => {
-                this.scene.stop('MundoAberto'); 
-                this.scene.start('QuizScene', 
-                {
-                    returnX: this.player.x, 
-                    returnY: this.player.y + 20
-                }); // Inicia a cena do Quiz passando a posição do jogador
-            }, null, this);
+                this.physics.add.overlap(this.player, zone, () => {
+                    if (!this.progression.missaoFoiConcluida('gatilho_quiz')) {
+                        zone.body.setEnable(false); 
+    
+                        this.scene.stop('MundoAberto');
+                        this.scene.start('QuizScene', { 
+                            returnX: this.player.x, 
+                            returnY: this.player.y + 20
+                        });
+                    }
+                    
+                }, null, this);
 
         }
 
@@ -106,9 +115,7 @@ export default class MundoAberto extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-        if (this.sys.game.device.input.touch) {
-            this.createDpad();
-        }
+        this.createDpad();
     }
 
     createDpad() {
@@ -118,7 +125,7 @@ export default class MundoAberto extends Phaser.Scene {
         const dpadDepth = 100; 
 
         const baseX = buttonSpacing * 2;
-        const baseY = this.scale.height - buttonSpacing * 2.9;
+        const baseY = this.scale.height - buttonSpacing ;
 
         const arrowUp = this.add.rectangle(baseX, baseY - buttonSpacing, buttonSize, buttonSize, 0x000000, dpadAlpha)
             .setInteractive().setScrollFactor(0).setDepth(dpadDepth);

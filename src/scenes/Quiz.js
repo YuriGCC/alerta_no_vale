@@ -10,6 +10,9 @@ export default class Quiz extends Phaser.Scene {
     }
 
     create() {
+        // Checa da cena de progressão 
+        this.progression = this.scene.get('Progressao');
+
         const quizData = {
             pergunta: "Durante um temporal, qual a melhor atitude?",
             opcoes: [
@@ -87,6 +90,8 @@ export default class Quiz extends Phaser.Scene {
             graficosBotaoClicado.clear();
             graficosBotaoClicado.fillStyle(0x009900, 1);
             graficosBotaoClicado.fillRoundedRect(graficosBotaoClicado.x, graficosBotaoClicado.y, graficosBotaoClicado.width, graficosBotaoClicado.height, 16);
+            
+            this.progression.missaoCompleta('gatilho_quiz');
         } else {
             textoFeedback.setText("Errado! Tente novamente.");
             textoFeedback.setColor('#ff0000');

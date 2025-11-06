@@ -17,7 +17,10 @@ export default class PreCarregadorCenas extends Phaser.Scene {
     }
 
     create() {
-        // Inicia a próxima cena
+        // inicia a cena e a mantém rodando de fundo
+        this.scene.launch('Progressao');
+
+        // Inicia a cena principal do jogo
         this.scene.start('MundoAberto');
     }
 }
