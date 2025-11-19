@@ -21,7 +21,7 @@ export default class MundoAberto extends Phaser.Scene {
     }
 
     create() {
-        // Checa da cena de progressão 
+        // Pega a cena de progressão 
         this.progressao = this.scene.get('Progressao');
 
         const map = this.make.tilemap({ key: 'mapaJSON' });
@@ -108,7 +108,7 @@ export default class MundoAberto extends Phaser.Scene {
             progressaoZone.body.setAllowGravity(false);
             progressaoZone.body.setImmovable(true);
 
-            this.physics.add.overlap(this.player, progressaoTrigger, () => {
+            this.physics.add.overlap(this.player, progressaoZone, () => {
             }, null, this);
         }
 
@@ -124,7 +124,15 @@ export default class MundoAberto extends Phaser.Scene {
             peDeVentoZone.body.setAllowGravity(false);
             peDeVentoZone.body.setImmovable(true);
 
-            this.physics.add.overlap(this.player, peDeVentoTrigger, () => {
+            this.physics.add.overlap(this.player, peDeVentoZone, () => {
+                if (!this.progressao.missaoFoiConcluida('gatilho_pe_de_vento')) {
+                    peDeVentoZone.body.setEnable(false);
+                    this.scene.stop('MundoAberto');
+                    this.scene.start('PeDeVento', {
+                        returnX: this.player.x, 
+                        returnY: this.player.y + 20
+                    });
+                }
             }, null, this);
         }
 
@@ -140,7 +148,7 @@ export default class MundoAberto extends Phaser.Scene {
             enchenteZone.body.setAllowGravity(false);
             enchenteZone.body.setImmovable(true);
 
-            this.physics.add.overlap(this.player, riscoEnchenteTrigger, () => {
+            this.physics.add.overlap(this.player, enchenteZone, () => {
             }, null, this);
         }
 
@@ -156,7 +164,14 @@ export default class MundoAberto extends Phaser.Scene {
             arrastaSoltaZone.body.setAllowGravity(false);
             arrastaSoltaZone.body.setImmovable(true);
 
-            this.physics.add.overlap(this.player, arrastaSoltaTrigger, () => {
+            this.physics.add.overlap(this.player, arrastaSoltaZone, () => {
+
+                if (!this.progressao.missaoFoiConcluida('gatilho_arrasta_solta')) {
+                    arrastaSoltaZone.body.setEnable(false);
+
+                    this.scene.stop('MundoAberto');
+                    this.scene.start('ArrastaSolta');
+                }
             }, null, this);
         }
 
@@ -172,7 +187,7 @@ export default class MundoAberto extends Phaser.Scene {
             seteErrosZone.body.setAllowGravity(false);
             seteErrosZone.body.setImmovable(true);
 
-            this.physics.add.overlap(this.player, seteErrosTrigger, () => {
+            this.physics.add.overlap(this.player, seteErrosZone, () => {
             }, null, this);
         }
 
@@ -236,8 +251,19 @@ export default class MundoAberto extends Phaser.Scene {
                 this.physics.world.enable(lixoZone);
                 lixoZone.body.setAllowGravity(false);
                 lixoZone.body.setImmovable(true);
+
+                const triggerID = separarLixoZone.name;
                 
                 this.physics.add.overlap(this.player, lixoZone, () => {
+                    if (!this.progressao.missaoFoiConcluida(triggerID)) {
+                        lixoZone.body.setEnable(false); 
+                        this.scene.stop('MundoAberto');
+                        this.scene.start('SepararLixo', { 
+                            returnX: this.player.x, 
+                            returnY: this.player.y + 20,
+                            triggerID: triggerID 
+                        });
+                    }
                 }, null, this);
             }
         }
@@ -266,12 +292,10 @@ export default class MundoAberto extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
         if (this.scene.isActive('Interface')) {
-
-            this.scene.setVisible(true, 'Interface');
+            this.scene.get('Interface').setAtiva(true);
             this.scene.bringToTop('Interface');
-        
         } else {
-            this.scene.launch('Interface');
+            this.scene.launch('Interface'); 
         }
 
         this.createDpad();

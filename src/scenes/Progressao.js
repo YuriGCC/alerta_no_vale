@@ -9,12 +9,31 @@ export default class Progressao extends Phaser.Scene {
 
         this.missoesCompletas = {};
         this.medalhas = 0;
+        this.missoesLixoCompletas = 0;
+        this.totalMissoesLixo = 5;
     }
 
     missaoCompleta(idMissao) {
-        if (!this.missaoFoiConcluida(idMissao)) {
-            this.missoesCompletas[idMissao] = true;
-            this.adicionarMedalha(); 
+        if (this.missaoFoiConcluida(idMissao)) {
+            return;
+        }
+
+
+        this.missoesCompletas[idMissao] = true;
+
+        // Lógica para concluir as cenas de lixo
+        if (idMissao.startsWith('gatilho_separar_lixo_')) {
+            this.missoesLixoCompletas++;
+            
+            // Verifica se o jogador completou todas as missoes de lixo
+            if (this.missoesLixoCompletas >= this.totalMissoesLixo) {
+                this.adicionarMedalha();
+                this.missoesCompletas['missao_lixo_completa'] = true; 
+            }
+        } 
+        // Lógica para o restante das missões
+        else if (missionId === 'gatilho_quiz' || missionId === 'gatilho_pe_de_vento') {
+            this.adicionarMedalha();
         }
     }
 

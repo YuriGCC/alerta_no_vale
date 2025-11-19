@@ -10,8 +10,12 @@ export default class Quiz extends Phaser.Scene {
     }
 
     create() {
-        this.scene.get('Interface').ehVisivel(false);
-        // Checa da cena de progressão 
+
+        if (this.scene.isActive('Interface')) {
+            this.scene.get('Interface').setAtiva(false);
+        }
+
+        // Pega a cena de progressão
         this.progression = this.scene.get('Progressao');
 
         const quizData = {

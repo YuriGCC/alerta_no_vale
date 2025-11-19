@@ -4,18 +4,19 @@ export default class Interface extends Phaser.Scene {
         this.quantidadeMedalhasTexto = null;
         this.progressao = null;
         this.visivel = true;
+        this.elementos = [];
     }
 
     create() {
-        // Checa da cena de progressão 
+        // Pega a cena de progressão 
         this.progressao = this.scene.get('Progressao');
 
         // Adiciona o ícone da medalha
-        this.add.image(40, 40, 'medalha')
-            .setScrollFactor(0)
-            .setDepth(100)
-            .setScale(1.5); 
-
+        const medalha = this.add.image(40, 40, 'medalha')
+        .setScrollFactor(0)
+        .setDepth(100)
+        .setScale(0.3);
+        
         // Adiciona o texto da pontuação
         this.quantidadeMedalhasTexto = this.add.text(70, 28, '0', {
             fontSize: '32px',
@@ -25,6 +26,8 @@ export default class Interface extends Phaser.Scene {
             strokeThickness: 4
         }).setScrollFactor(0).setDepth(100);
 
+        // Guarda os elementos para controle de visibilidade
+        this.elementos = [medalha, this.quantidadeMedalhasTexto];
 
         this.atualizarMedalhas(this.progressao.obterMedalhas());
 
@@ -34,6 +37,7 @@ export default class Interface extends Phaser.Scene {
 
         this.scene.bringToTop();
     }
+    
 
 
     atualizarMedalhas(quantidadeMedalhas) {
@@ -42,7 +46,9 @@ export default class Interface extends Phaser.Scene {
         }
     }
 
-    ehVisivel(valor) {
-        this.visivel = valor;
+    setAtiva(ativa) {
+        this.visivel = ativa;
+        this.elementos.forEach(el => el.setVisible(ativa));
+        this.input.enabled = ativa;
     }
 }
