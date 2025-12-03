@@ -30,9 +30,8 @@ export default class Progressao extends Phaser.Scene {
                 this.adicionarMedalha();
                 this.missoesCompletas['missao_lixo_completa'] = true; 
             }
-        } 
-        // Lógica para o restante das missões
-        else if (missionId === 'gatilho_quiz' || missionId === 'gatilho_pe_de_vento') {
+        } else {
+            // Lógica para o restante das missões
             this.adicionarMedalha();
         }
     }

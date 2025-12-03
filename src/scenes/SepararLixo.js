@@ -2,18 +2,28 @@ export default class SepararLixo extends Phaser.Scene {
     constructor() {
         super('SepararLixo');
 
-        this.lixeirasMap = {
-            'vidro': 0,   
-            'papel': 1,    
-            'plastico': 2,
-            'organico': 3   
-        };
-
-        this.tiposDeLixo = {
-            'papel':    { x: 30,  y: 20,  w: 230, h: 210 },
-            'plastico': { x: 30,  y: 280, w: 230, h: 200 },
-            'vidro':    { x: 300, y: 20,  w: 230, h: 210 },
-            'organico': { x: 620, y: 280, w: 230, h: 200 }
+        // Configuração central: Liga o TIPO -> LIXEIRA -> ITEM
+        // Estou assumindo as cores padrões da coleta seletiva (Brasil):
+        // Papel = Azul, Plástico = Vermelho, Vidro = Verde.
+        // Nota: Geralmente Amarelo é Metal e Marrom é Orgânico. 
+        // Como você tem "lixeira_amarela" e "organico.png", liguei os dois para o jogo funcionar.
+        this.configLixo = {
+            'papel': { 
+                binImg: 'lixeira_azul', 
+                itemImg: 'papel' 
+            },
+            'plastico': { 
+                binImg: 'lixeira_vermelha', 
+                itemImg: 'plastico' 
+            },
+            'vidro': { 
+                binImg: 'lixeira_verde', 
+                itemImg: 'vidro' 
+            },
+            'organico': { 
+                binImg: 'lixeira_amarela', 
+                itemImg: 'organico' 
+            }
         };
 
         this.returnPos = {};
@@ -21,160 +31,157 @@ export default class SepararLixo extends Phaser.Scene {
         this.triggerID = '';
 
         this.score = 0;
-        this.scoreToWin = 5; // Precisa de acertar 5 lixos
+        this.scoreToWin = 5; 
         this.scoreText = null;
         this.spawnTimer = null;
     }
-
+    
     init(data) {
         this.returnPos = data.returnPos || {};
-        this.triggerID = data.triggerID || 'gatilho_separar_lixo_1'; // O ID do gatilho que nos chamou
+        this.triggerID = data.triggerID || 'gatilho_separar_lixo_1';
     }
 
     create() {
         const { width, height } = this.scale;
-        this.cameras.main.setBackgroundColor('#333333'); // Fundo cinzento escuro
-
-        // Obter referências
+        this.cameras.main.setBackgroundColor('#333333');
+    
         this.progressao = this.scene.get('Progressao');
         if (this.scene.isActive('Interface')) {
-            this.scene.get('Interface').setAtiva(false); // Esconde o HUD
+            this.scene.get('Interface').setAtiva(false);
         }
         
         this.score = 0;
-
-        // --- Criar as Lixeiras (Drop Zones) ---
-        const yPos = height * 0.85; // Posição Y das lixeiras
-        this.lixeiras = this.physics.add.group(); // Grupo de física para as lixeiras
-
-        // Criar as 4 lixeiras
-        Object.keys(this.lixeirasMap).forEach((tipo, index) => {
-            const xPos = (width * (index + 1)) / 5; // Espaçar 4 lixeiras
-            const frame = this.lixeirasMap[tipo];
+    
+        // Criar as Lixeiras e Legendas ---
+        const yPos = height * 0.85; 
+        const chaves = Object.keys(this.configLixo); 
+        const totalLixeiras = chaves.length;
+    
+        chaves.forEach((tipo, index) => {
+            const config = this.configLixo[tipo];
             
-            const lixeira = this.lixeiras.create(xPos, yPos, 'lixeiras', frame)
+            // Calcula posição X
+            const espacamento = width / (totalLixeiras + 1);
+            const xPos = espacamento * (index + 1);
+            
+            // Cria a imagem da lixeira
+            const lixeira = this.physics.add.image(xPos, yPos, config.binImg)
                 .setData('tipo_lixo_correto', tipo)
-                .setImmovable(true); // Fica parada
-
-            // Ativar a lixeira como uma zona de drop
+                .setImmovable(true);
+    
+            lixeira.setScale(0.5); 
             lixeira.setInteractive();
             lixeira.input.dropZone = true;
-
-            // Destaque visual (debug)
-            // this.input.enableDebug(lixeira); 
+    
+            // Legenda embaixo da lixeira
+            // Pega o nome do tipo (ex: 'papel') e transforma em maiúsculo ('PAPEL')
+            const textoLegenda = tipo.toUpperCase();
+    
+            this.add.text(xPos, yPos + 60, textoLegenda, { 
+                fontSize: '18px', 
+                fill: '#ffffff',
+                fontStyle: 'bold',
+                stroke: '#000000',   
+                strokeThickness: 3
+            }).setOrigin(0.5);         
         });
-
-
-        // --- Texto de UI (Pontuação) ---
+    
+        // --- Texto de UI ---
         this.add.text(width / 2, 50, 'Arraste o lixo para a lixeira correta!', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
         this.scoreText = this.add.text(width / 2, 100, 'Acertos: 0 / 5', { fontSize: '28px', fill: '#ffff00' }).setOrigin(0.5);
-
-
-        // --- Eventos de Drag & Drop ---
+    
+    
         this.input.on('dragstart', (pointer, lixo) => {
-            lixo.setDepth(1); // Lixo fica por cima de tudo ao arrastar
+            lixo.setDepth(1);
         });
-
+    
         this.input.on('drag', (pointer, lixo, dragX, dragY) => {
             lixo.setPosition(dragX, dragY);
         });
-
+    
         this.input.on('drop', (pointer, lixo, lixeira) => {
             const tipoLixo = lixo.getData('tipo_lixo');
             const tipoLixeira = lixeira.getData('tipo_lixo_correto');
-
+    
             if (tipoLixo === tipoLixeira) {
-                // --- ACERTOU ---
                 this.score++;
                 this.scoreText.setText(`Acertos: ${this.score} / ${this.scoreToWin}`);
-                lixo.destroy(); // Destrói o lixo
+                lixo.destroy();
                 
-                // (Tocar som de acerto)
-
                 if (this.score >= this.scoreToWin) {
                     this.ganharJogo();
                 }
             } else {
-                // --- ERROU ---
-                lixo.setPosition(lixo.input.dragStartX, lixo.input.dragStartY); // Volta ao início
-                // (Tocar som de erro)
+                lixo.setPosition(lixo.input.dragStartX, lixo.input.dragStartY);
+                this.tweens.add({
+                    targets: lixo,
+                    alpha: 0.5,
+                    duration: 100,
+                    yoyo: true,
+                    repeat: 1
+                });
             }
         });
-
+    
         this.input.on('dragend', (pointer, lixo, dropped) => {
             if (!dropped) {
-                // Se largar fora de uma lixeira, volta ao início
                 lixo.setPosition(lixo.input.dragStartX, lixo.input.dragStartY);
             }
             lixo.setDepth(0);
         });
         
-        // --- Iniciar o Jogo ---
         this.iniciarGeradorDeLixo();
     }
 
     iniciarGeradorDeLixo() {
-        // Gera um lixo novo a cada 2.5 segundos
         this.spawnTimer = this.time.addEvent({
             delay: 2500,
             callback: this.spawnLixo,
             callbackScope: this,
             loop: true
         });
-
-        // Gera o primeiro lixo imediatamente
         this.spawnLixo();
     }
 
     spawnLixo() {
         const { width } = this.scale;
         
-        // Escolhe um tipo de lixo aleatório (Papel, Plastico, Vidro, Organico)
-        const tiposDisponiveis = Object.keys(this.tiposDeLixo);
-        const tipoAleatorio = Phaser.Utils.Array.GetRandom(tiposDisponiveis); // ex: "papel"
+        // 1. Escolhe um tipo aleatório das chaves disponíveis
+        const chaves = Object.keys(this.configLixo);
+        const tipoAleatorio = Phaser.Utils.Array.GetRandom(chaves);
         
-        // Pega os dados do "corte" (crop)
-        const cropData = this.tiposDeLixo[tipoAleatorio];
-        
-        // Posição X aleatória no topo
+        // 2. Pega o nome da imagem correspondente (ex: 'papel')
+        const imagemKey = this.configLixo[tipoAleatorio].itemImg;
+
         const xPos = Phaser.Math.Between(width * 0.2, width * 0.8);
         
-        // --- [NOVO] LÓGICA DE 'setCrop' ---
-        
-        // 1. Cria o sprite usando a IMAGEM INTEIRA
-        const lixo = this.add.sprite(xPos, 200, 'lixo_atlas')
+        // 3. Cria o sprite direto com a imagem correta (sem crop!)
+        const lixo = this.physics.add.sprite(xPos, 200, imagemKey)
             .setData('tipo_lixo', tipoAleatorio)
             .setInteractive();
         
-        // 2. "Corta" o sprite para mostrar apenas a parte que queremos
-        lixo.setCrop(cropData.x, cropData.y, cropData.w, cropData.h);
-            
-        // 3. Ajusta a escala (sprites de um atlas são grandes)
-        lixo.setScale(0.5); // Ajuste este valor
-
         this.input.setDraggable(lixo);
         
-        // (Guarda a posição inicial para o 'dragend')
+        // Ajuste a escala conforme o tamanho das suas imagens png
+        lixo.setScale(0.2); 
+
         lixo.input.dragStartX = lixo.x;
         lixo.input.dragStartY = lixo.y;
     }
 
     ganharJogo() {
-        // Remove todos os lixos
+        this.spawnTimer.remove(); // Para de gerar lixo
+
         this.children.getAll().forEach(child => {
-            if (child.getData('tipo_lixo')) {
-                child.destroy();
-            }
+            if (child.getData('tipo_lixo')) child.destroy();
         });
         
         this.add.text(this.scale.width / 2, this.scale.height / 2, 'Muito bem!', { 
             fontSize: '40px', fill: '#00ff00', fontStyle: 'bold' 
         }).setOrigin(0.5);
 
-
         this.progressao.missaoCompleta(this.triggerID);
         
-        // Espera 2 segundos e volta ao mundo aberto
         this.time.delayedCall(2000, () => {
             this.sairDaCena();
         });

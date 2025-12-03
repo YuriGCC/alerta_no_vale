@@ -4,6 +4,7 @@ export default class MundoAberto extends Phaser.Scene {
         this.player = null;
         this.cursors = null;
         this.dpad = null;
+        this.debugKey = null;
         this.fadedTiles = []; 
 
         this.chaoLayer = null;
@@ -21,6 +22,7 @@ export default class MundoAberto extends Phaser.Scene {
     }
 
     create() {
+        this.debugKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         // Pega a cena de progressão 
         this.progressao = this.scene.get('Progressao');
 
@@ -344,6 +346,12 @@ export default class MundoAberto extends Phaser.Scene {
     }
 
     update() {
+        if (Phaser.Input.Keyboard.JustDown(this.debugKey)) {
+            this.scene.stop('MundoAberto');
+            this.scene.start('FimDeJogo');
+            return;
+        }
+
         const speed = 160;
         this.player.setVelocity(0);
 

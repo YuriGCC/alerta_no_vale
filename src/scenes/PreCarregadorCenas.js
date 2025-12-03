@@ -16,6 +16,16 @@ export default class PreCarregadorCenas extends Phaser.Scene {
             frameHeight: 61 
         });
 
+        this.load.image('lixeira_azul', 'assets/lixeira_azul.png');
+        this.load.image('lixeira_vermelha', 'assets/lixeira_vermelha.png');
+        this.load.image('lixeira_verde', 'assets/lixeira_verde.png');
+        this.load.image('lixeira_amarela', 'assets/lixeira_amarela.png');
+
+        this.load.image('papel', 'assets/papel.png');
+        this.load.image('plastico', 'assets/plastico.png');
+        this.load.image('vidro', 'assets/vidro.png');
+        this.load.image('organico', 'assets/organico.png');
+
 
         // Gráficos cena pé de vendo
         let graphics = this.make.graphics();
@@ -33,15 +43,9 @@ export default class PreCarregadorCenas extends Phaser.Scene {
         graphics.fillStyle(0xFFFFFF, 1.0);
         graphics.fillRect(0, 0, 100, 150);
         graphics.generateTexture('janela_aberta', 100, 150);
-
+        
         graphics.destroy();
 
-        this.load.spritesheet('lixeiras', 'assets/tipos_lixeira.png', {
-            frameWidth: 32,
-            frameHeight: 64
-        });
-
-        this.load.image('lixo_atlas', 'assets/tipos_lixo.jpg');
     }   
 
     create() {

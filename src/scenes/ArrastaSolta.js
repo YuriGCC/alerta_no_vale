@@ -242,7 +242,7 @@ export default class ArrastaSolta extends Phaser.Scene {
         const dados = this.dadosDasFases[faseIndex];
 
         if (!dados) {
-            this.progression.completeMission(this.triggerID); 
+            this.progression.missaoCompleta(this.triggerID); 
             this.scene.start('MundoAberto', this.returnPos);
             return;
         }

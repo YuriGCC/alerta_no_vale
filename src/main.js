@@ -9,6 +9,7 @@ import RiscoEnchente from './scenes/RiscoEnchente.js';
 import SepararLixo from './scenes/SepararLixo.js';
 import SeteErros from './scenes/SeteErros.js';
 import Interface from './scenes/Interface.js';
+import FimDeJogo from './scenes/FimDeJogo.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -32,7 +33,7 @@ const config = {
     scene: [ 
         PreCarregadorCenas, MundoAberto, Quiz, Progressao,
         ArrastaSolta, PeDeVento, RiscoDeslizamento, RiscoEnchente,
-        SepararLixo, SeteErros, Interface
+        SepararLixo, SeteErros, Interface, FimDeJogo
     ]
 }
 
