@@ -39,7 +39,7 @@ export default class SepararLixo extends Phaser.Scene {
     init(data) {
         this.returnPos = data.returnPos || {};
         this.triggerID = data.triggerID || 'gatilho_separar_lixo_1';
-    }
+    } 
 
     create() {
         const { width, height } = this.scale;

@@ -26,6 +26,7 @@ export default class PreCarregadorCenas extends Phaser.Scene {
         this.load.image('vidro', 'assets/vidro.png');
         this.load.image('organico', 'assets/organico.png');
 
+        this.load.image('rachadura', 'assets/rachadura.png')
 
         // Gráficos cena pé de vendo
         let graphics = this.make.graphics();
