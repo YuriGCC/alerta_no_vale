@@ -151,6 +151,14 @@ export default class MundoAberto extends Phaser.Scene {
             enchenteZone.body.setImmovable(true);
 
             this.physics.add.overlap(this.player, enchenteZone, () => {
+                if (!this.progressao.missaoFoiConcluida('gatilho_risco_enchente')) {
+                    enchenteZone.body.setEnable(false);
+                    this.scene.stop('MundoAberto');
+                    this.scene.start('RiscoEnchente', {
+                        returnX: this.player.x,
+                        returnY: this.player.y + 20
+                    });
+                }
             }, null, this);
         }
 
@@ -206,6 +214,13 @@ export default class MundoAberto extends Phaser.Scene {
             riscoDeslizamentoZone.body.setImmovable(true);
 
             this.physics.add.overlap(this.player, riscoDeslizamentoZone, () => {
+                riscoDeslizamentoZone.body.setEnable(false);
+                this.scene.stop('MundoAberto');
+                this.scene.start('RiscoDeslizamento', {
+                        returnX: this.player.x,
+                        returnY: this.player.y + 20
+                });
+                
             }, null, this);
         }
 
